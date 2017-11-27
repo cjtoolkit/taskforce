@@ -1,3 +1,41 @@
+/*
+TaskForce, a simple, functional task runner without the plugin nonsense!
+
+	package main
+
+	import (
+		"fmt"
+		"os"
+
+		"github.com/cjtoolkit/taskforce"
+	)
+
+	func task() *taskforce.TaskForce {
+		tf := taskforce.InitTaskForce()
+
+		tf.Register("hello", func() {
+			fmt.Println("Hello,")
+		})
+
+		tf.Register("world", func() {
+			fmt.Println("World.")
+		})
+
+		tf.Register("echo-world", func() {
+			tf.ExecCmd("echo", "world")
+		})
+
+		tf.Register("both", func() {
+			tf.Run("hello", "world")
+		})
+
+		return tf
+	}
+
+	func main() {
+		task().Run(os.Args[1:]...)
+	}
+*/
 package taskforce
 
 import (
@@ -13,6 +51,7 @@ type TaskForce struct {
 	runFn      func(names ...string)
 }
 
+// Create new instance of TaskForce
 func InitTaskForce() *TaskForce {
 	tf := &TaskForce{
 		tasks: map[string]func(){},
@@ -27,14 +66,27 @@ func InitTaskForce() *TaskForce {
 	return tf
 }
 
+/*
+Register Task to TaskForce, has no effect after first run.
+
+Not concurrent safe.
+*/
 func (tf *TaskForce) Register(name string, task func()) {
 	tf.registerFn(name, task)
 }
 
+/*
+Run a selected task.
+
+Non concurrent safe on first run, but is concurrent safe after first run
+
+Note: will recover from error, on first run.
+*/
 func (tf *TaskForce) Run(names ...string) {
 	tf.runFn(names...)
 }
 
+// Execute Terminal Command, will panic if there is error with the command.
 func (tf *TaskForce) ExecCmd(name string, args ...string) {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
@@ -44,6 +96,7 @@ func (tf *TaskForce) ExecCmd(name string, args ...string) {
 	tf.CheckError(cmd.Run())
 }
 
+// Check Error, will panic if there is an error.
 func (tf *TaskForce) CheckError(err error) {
 	if nil != err {
 		panic(err)
@@ -73,9 +126,9 @@ func (tf *TaskForce) recover() {
 		fmt.Fprintln(os.Stderr, string(debug.Stack()))
 		fmt.Println("-- Failed --")
 		os.Exit(1)
-	} else {
-		fmt.Println("-- Success --")
 	}
+
+	fmt.Println("-- Success --")
 }
 
 func (tf *TaskForce) run(names ...string) {
