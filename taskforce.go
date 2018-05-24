@@ -124,9 +124,10 @@ func (tf *TaskForce) register(name string, task func()) {
 func (tf *TaskForce) recover() {
 	if r := recover(); nil != r {
 		tf.util.DoRecover(r)
-	} else {
-		tf.util.DisplaySuccess()
+		return
 	}
+
+	tf.util.DisplaySuccess()
 }
 
 func (tf *TaskForce) run(names ...string) {
