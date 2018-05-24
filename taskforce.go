@@ -42,19 +42,20 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime/debug"
 )
 
 type TaskForce struct {
 	tasks      map[string]func()
 	registerFn func(name string, task func())
 	runFn      func(names ...string)
+	util       utilI
 }
 
 // Create new instance of TaskForce
 func InitTaskForce() *TaskForce {
 	tf := &TaskForce{
 		tasks: map[string]func(){},
+		util:  util{},
 	}
 	tf.registerFn = func(name string, task func()) {
 		tf.register(name, task)
@@ -99,7 +100,7 @@ func (tf *TaskForce) ExecCmd(name string, args ...string) {
 // Check Error, will panic if there is an error.
 func (tf *TaskForce) CheckError(err error) {
 	if nil != err {
-		panic(err)
+		tf.util.DoPanic(err)
 	}
 }
 
@@ -122,13 +123,10 @@ func (tf *TaskForce) register(name string, task func()) {
 
 func (tf *TaskForce) recover() {
 	if r := recover(); nil != r {
-		fmt.Fprintln(os.Stderr, "Has Errored", r)
-		fmt.Fprintln(os.Stderr, string(debug.Stack()))
-		fmt.Println("-- Failed --")
-		os.Exit(1)
+		tf.util.DoRecover(r)
+	} else {
+		tf.util.DisplaySuccess()
 	}
-
-	fmt.Println("-- Success --")
 }
 
 func (tf *TaskForce) run(names ...string) {
