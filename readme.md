@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/cjtoolkit/taskforce.svg?branch=master)](https://travis-ci.com/cjtoolkit/taskforce)
+
 # TaskForce
 
 a simple, functional task runner without the plugin nonsense!
