@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/cjtoolkit/taskforce.svg?branch=master)](https://travis-ci.com/cjtoolkit/taskforce)
+[![Build Status](https://travis-ci.org/cjtoolkit/taskforce.svg?branch=master)](https://travis-ci.org/cjtoolkit/taskforce)
 
 # TaskForce
 
